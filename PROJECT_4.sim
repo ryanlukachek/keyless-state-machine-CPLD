@@ -1,0 +1,75 @@
+%SIGNAL
+PIN  22 =  AD 
+PIN   1 =  CLK 
+PIN  23 =  DD 
+PIN   2 =  L 
+PIN  20 =  QA 
+PIN  19 =  QB 
+PIN   5 =  R 
+PIN   4 =  S 
+PIN  21 =  SD 
+PIN   3 =  U 
+%END
+
+%FIELD
+FIELD state_n = QA,QB
+%END
+
+%EQUATION
+AD =>
+    QA
+
+DD =>
+    QA
+  # QB
+
+QA.d  =>
+    L & QA & !S & U
+  # L & !QA & QB & S & !U
+  # L & QA & !U
+  # L & QA & S & U
+
+QA.ar  =>
+    R
+
+QA.ck  =>
+    CLK
+
+QA.oe  =>
+    1 
+
+QA.sp QB.sp  =>
+    0 
+
+QB.d  =>
+    L & QA & QB & S & U
+  # L & !QA & !QB & S & !U
+  # L & !QA & QB & U
+  # L & !QA & QB & !S & !U
+  # L & QA & !QB & !S & U
+  # L & QA & QB & !U
+
+QB.ar  =>
+    R
+
+QB.ck  =>
+    CLK
+
+QB.oe  =>
+    1 
+
+QB.sp  =>
+    
+SD =>
+    QA & QB
+
+AD.oe  =>
+    1 
+
+DD.oe  =>
+    1 
+
+SD.oe  =>
+    1 
+
+%END

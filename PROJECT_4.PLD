@@ -1,0 +1,60 @@
+Name     Project_4 ;
+PartNo   00 ;
+Date     12/1/2020 ;
+Revision 01 ;
+Designer Ryan Lukachek ;
+Company  Penn State EE ;
+Assembly None ;
+Location  ;
+Device   v750c ;
+
+/* *************** INPUT PINS *********************/
+PIN    1 = CLK ; /*Clock input*/ 
+PIN    2 = L ; /* Lock input */ 
+PIN    3 = U ; /* Unlock input */
+PIN    4 = S ; /* Side door input */
+PIN	5 = R ; /* Reset input */
+
+/* *************** OUTPUT PINS *********************/
+PIN    23 = DD ; /*D-type flip flop output (driver's door)*/
+PIN    22 = AD ; /*D-type flip flop output (all doors)*/
+PIN    21 = SD ; /*D-type flip flop output (side door)*/
+PIN	20 = QA ;
+PIN	19 = QB ; 
+
+/* define states for FSM */
+FIELD state_n = [QA,QB];
+$define S0 'b'00
+$define S1 'b'01
+$define S2 'b'10
+$define S3 'b'11
+
+/*D-type flip-flop control signals*/
+[QA,QB].OE = 'b'11; /* Enable output pins to be programmable */
+[QA,QB].SP = 'b'00; /* Set synchronus preset of flip flop */
+[QA,QB].AR = R; /* Assign asynchronous reset to R */
+[QA,QB].CK = CLK; /* Assign clock to CLK */
+
+/* Output Control Signals */
+DD = QA # QB;
+AD = QA;
+SD = QA & QB;
+
+/************** Implement FSM***************/
+SEQUENCED state_n {
+PRESENT S0 /*Conditional statements for S0 */
+	IF !L # U NEXT S0;
+	IF L & !U & S NEXT S1;
+PRESENT S1 /*Conditional statements for S1 */
+	IF !L NEXT S0;
+	IF (L & U) # (L & !U & !S) NEXT S1;
+	IF L & !U & S NEXT S2;
+PRESENT S2 /*Conditional statements for S2 */
+	IF !L NEXT S0;
+	IF (L & !U) # (L & U & S) NEXT S2;
+	IF L & U & !S NEXT S3;
+PRESENT S3 /*Conditional statements for S3 */
+	IF !L NEXT S0;
+	IF (L & !U) # (L & U & S) NEXT S3;
+	IF L & U & !S NEXT S2;
+}
